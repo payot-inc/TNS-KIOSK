@@ -35,6 +35,14 @@
               </b>원
             </dd>
           </dl>
+          <dl>
+            <dt>잔액</dt>
+            <dd>
+              <b>
+                {{ this.less | numeral('0,0') }}
+              </b>원
+            </dd>
+          </dl>
         </div>
 
         <div class="bottom_btns">
@@ -59,7 +67,7 @@ import { zip, interval, range } from 'rxjs';
 import { skip, tap, take, delay, map, startWith, takeLast } from 'rxjs/operators';
 
 export default {
-  props: ['products'],
+  props: ['products', 'less'],
   data() {
     return {
       timeOut: 10,

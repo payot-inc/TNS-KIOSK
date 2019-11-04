@@ -35,7 +35,16 @@
         <div class="credit">
           <p><b>결제방법</b>을 선택해주세요</p>
           <div class="row">
-            <div class="col-lg-6" @click="submit">
+            <div
+              class="col-lg-4"
+              @click="
+                $bvModal.msgBoxOk('지금은 카드결제를 이용하실 수 없습니다', {
+                  centered: true,
+                  size: 'lg',
+                  okTitle: '확인',
+                })
+              "
+            >
               <dl data-toggle="modal" data-target="#card_modal" class="modal-on">
                 <dt>
                   <span><img src="@/assets/img/card_img.jpg"/></span>
@@ -43,12 +52,20 @@
                 <dd>카드결제</dd>
               </dl>
             </div>
-            <div class="col-lg-6" @click="pay('cash')">
-              <dl data-toggle="modal" data-target="#coin_modal" class="modal-on">
+            <div class="col-lg-4" @click="pay('cash')">
+              <dl>
                 <dt>
                   <span><img src="@/assets/img/coin.png"/></span>
                 </dt>
                 <dd>현금결제</dd>
+              </dl>
+            </div>
+            <div class="col-lg-4" @click="pay('mobile')">
+              <dl>
+                <dt>
+                  <span><img src="@/assets/img/mobile.png"/></span>
+                </dt>
+                <dd>모바일 결제</dd>
               </dl>
             </div>
           </div>
@@ -58,17 +75,20 @@
     </div>
     <!-- order -->
 
-    <cash-modal ref="cash" />
+    <cash-modal ref="cash" @submit="submit($event)" @error="printError($event)" />
+    <mobile-modal ref="mobile" @submit="submit($event)" />
   </div>
 </template>
 
 <script>
 import CashModal from '@/components/CashModal.vue';
+import MobileModal from '@/components/MobileModal.vue';
 
 export default {
   props: ['products'],
   components: {
     CashModal,
+    MobileModal,
   },
   computed: {
     totalAmount() {
@@ -79,11 +99,39 @@ export default {
     pay(method) {
       if (method === 'cash') {
         this.$refs.cash.show(this.totalAmount, this.products);
+      } else if (method === 'mobile') {
+        this.$refs.mobile.show(this.totalAmount, this.products);
       }
     },
 
-    submit() {
-      this.$router.push({ name: 'result', params: { products: this.products } });
+    async submit({ type, less }) {
+      try {
+        await this.$axios.post('/pay', {
+          method: type,
+          returnCoin: less,
+          products: this.products,
+          amount: this.totalAmount,
+        });
+        this.$router.push({ name: 'result', params: { products: this.products, less } });
+      } catch (error) {
+        this.$bvModal.msgBoxOk('오류가 발생하였습니다', {
+          centered: true,
+          size: 'sm',
+          okTitle: '확인',
+        });
+      }
+    },
+
+    async printError({ print, message, code }) {
+      let msg = '';
+      if (print) {
+        msg = `오류가 발생하였습니다 [${code}]`;
+      } else {
+        msg = message;
+      }
+
+      await this.$bvModal.msgBoxOk(msg, { centered: true, size: 'sm', okTitle: '확인' });
+      this.$router.push({ name: 'home' });
     },
   },
 };
