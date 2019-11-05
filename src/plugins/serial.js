@@ -25,6 +25,7 @@ SerialPort.list((err, list) => {
     event.next('open');
     const parser = client.pipe(new Readline({ delimiters: '\r\n' }));
     parser.on('data', data => {
+      console.log(`response: ${data.trim()}`);
       message.next(data.trim());
     });
   });
