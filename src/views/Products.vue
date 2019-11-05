@@ -25,6 +25,16 @@
         />
       </div>
     </div>
+    <b-modal
+      ref="progress"
+      size="lg"
+      :no-close-on-backdrop="true"
+      :centered="true"
+      :hide-header="true"
+      :hide-footer="true"
+    >
+      상품목록을 불러오는 중 입니다...
+    </b-modal>
   </div>
 </template>
 
@@ -46,17 +56,17 @@ export default {
     return {
       list: [],
       selected: [],
+      modal: {
+        progress: false,
+      },
     };
   },
   async mounted() {
-    const modal = this.$bvModal.msgBoxOk('상품 목록을 불러오는 중 입니다', {
-      centered: true,
-      noCloseOnBackdrop: true,
-    });
+    this.modal.progress = true;
     setTimeout(async () => {
       await this.bindProduct();
-      console.log(await modal);
-    }, 3000);
+      this.modal.progress = false;
+    }, 2000);
   },
   methods: {
     async bindProduct() {
