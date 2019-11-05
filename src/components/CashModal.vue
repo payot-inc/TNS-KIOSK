@@ -57,7 +57,7 @@ export default {
   mounted() {
     this.sub.input = this.$serial.response
       .pipe(
-        filter(msg => /^\[r B U[\d]{6}\]$/.test(msg)),
+        filter(msg => /^\[r B T[\d]{6}\]$/.test(msg)),
         map(result => {
           const data = result
             .replace(/^\[/, '')
