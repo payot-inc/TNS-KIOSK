@@ -57,7 +57,7 @@ export default {
   mounted() {
     this.sub.input = this.$serial.response
       .pipe(
-        filter(msg => /^\[r B T[\d]{6}\]$/.test(msg)),
+        filter(msg => /^\[r B U[\d]{6}\]$/.test(msg)),
         map(result => {
           const data = result
             .replace(/^\[/, '')
@@ -120,7 +120,7 @@ export default {
           return `Q${machineId}/R${productId}/S${numeral(Number(price) / 100).format('000')}`;
         })
         .join('&');
-      const commend = `[q B U${numeral(amount).format('000000')}&${commendProductParams}]\r\n`;
+      const commend = `[q B T${numeral(amount).format('000000')}&${commendProductParams}]\r\n`;
       this.$serial.write(commend);
       this.total = amount;
       this.open = true;
