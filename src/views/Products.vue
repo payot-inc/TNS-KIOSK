@@ -49,7 +49,14 @@ export default {
     };
   },
   async mounted() {
-    await this.bindProduct();
+    const modal = this.$bvModal.msgBoxOk('상품 목록을 불러오는 중 입니다', {
+      centered: true,
+      noCloseOnBackdrop: true,
+    });
+    setTimeout(async () => {
+      await this.bindProduct();
+      console.log(await modal);
+    }, 3000);
   },
   methods: {
     async bindProduct() {
@@ -87,9 +94,13 @@ export default {
       try {
         const products = this.selected;
         if (products.length === 0) throw new Error('상품을 선택해 주세요');
-        this.$router.push({ name: 'pay', params: { products }});
+        this.$router.push({ name: 'pay', params: { products } });
       } catch (error) {
-        this.$bvModal.msgBoxOk('상품을 선택해 주세요', { centered: true, okTitle: '확인', size: 'lg' });
+        this.$bvModal.msgBoxOk('상품을 선택해 주세요', {
+          centered: true,
+          okTitle: '확인',
+          size: 'lg',
+        });
       }
     },
   },

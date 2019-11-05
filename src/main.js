@@ -4,6 +4,7 @@ import './plugins/serial';
 import './plugins/filters';
 import './plugins/bootstrap-vue';
 import './plugins/qrcode';
+import './plugins/socket';
 import App from './App.vue';
 import router from './router';
 import store from './store';

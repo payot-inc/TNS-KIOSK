@@ -5,6 +5,7 @@
     :centered="true"
     :hide-header="true"
     :hide-footer="true"
+    :no-close-on-backdrop="true"
     dialog-class="credit_modal"
     :body-class="['credit_modal']"
   >
@@ -26,7 +27,7 @@
         <dl>
           <dt>투입된 금액</dt>
           <dd>
-            <b>{{ amount }}</b> 원
+            <b>{{ amount | numeral('0,0') }}</b> 원
           </dd>
         </dl>
       </div>

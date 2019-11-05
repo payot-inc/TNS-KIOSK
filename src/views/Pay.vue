@@ -112,7 +112,7 @@ export default {
           products: this.products,
           amount: this.totalAmount,
         });
-        this.$router.push({ name: 'result', params: { products: this.products, less } });
+        this.$router.push({ name: 'result', params: { products: this.products, type, less } });
       } catch (error) {
         this.$bvModal.msgBoxOk('오류가 발생하였습니다', {
           centered: true,

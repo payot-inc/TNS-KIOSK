@@ -25,7 +25,8 @@
         <div class="credit_info">
           <dl>
             <dt>결제방법</dt>
-            <dd>현금</dd>
+            <dd>{{ { card: '카드', cash: '현금', mobile: '모바일' }[type] }}</dd>
+            <!-- <dd>{{ type }}</dd> -->
           </dl>
           <dl>
             <dt>결제금액</dt>
@@ -65,13 +66,18 @@
 <script>
 import { zip, interval, range } from 'rxjs';
 import { skip, tap, take, delay, map, startWith, takeLast } from 'rxjs/operators';
+import API from '@/mixin/api';
 
 export default {
-  props: ['products', 'less'],
+  props: ['products', 'type', 'less'],
+  mixins: [API],
   data() {
     return {
       timeOut: 10,
     };
+  },
+  mounted() {
+    this.getProductList();
   },
   subscriptions() {
     let counter = this.timeOut;

@@ -19,7 +19,7 @@
     "lodash": "^4.17.15",
     "moment": "^2.24.0",
     "rxjs": "^6.3.3",
-    "serialport": "^8.0.5",
+    "serialport": "^7",
     "vue": "^2.6.10",
     "vue-moment": "^4.0.0",
     "vue-numeral-filter": "^1.1.1",

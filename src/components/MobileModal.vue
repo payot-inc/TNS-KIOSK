@@ -5,6 +5,7 @@
     :centered="true"
     :hide-header="true"
     :hide-footer="true"
+    :no-close-on-backdrop="true"
     dialog-class="credit_modal"
     :body-class="['credit_modal']"
   >
@@ -30,6 +31,8 @@
 </template>
 
 <script>
+import { take } from 'rxjs/operators';
+
 export default {
   name: 'mobile-modal',
   data() {
@@ -37,7 +40,19 @@ export default {
       open: false,
       qrcode: '',
       total: 0,
+      observer: null,
+      sub: {
+        input: {},
+        submit: {},
+        error: {},
+      },
     };
+  },
+  watch: {
+    open(newValue) {
+      if (newValue) return;
+      this.observer.unsubscribe();
+    }
   },
   methods: {
     show(amount, products) {
@@ -46,6 +61,12 @@ export default {
         type: 'kiosk',
         amount,
       });
+      this.observer = this.$socket.response.pipe(take(1)).subscribe(
+        value => {
+          this.$emit('submit', { type: 'mobile', less: 0 });
+        },
+        () => {},
+      );
       this.open = true;
     },
   },
