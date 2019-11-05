@@ -121,6 +121,7 @@ export default {
         })
         .join('&');
       const commend = `[q B T${numeral(amount).format('000000')}&${commendProductParams}]\r\n`;
+      console.log(commend);
       this.$serial.write(commend);
       this.total = amount;
       this.open = true;
