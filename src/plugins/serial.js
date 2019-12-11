@@ -15,7 +15,7 @@ const sendObserver = message => {
 
 // 메시지 수신시 파싱
 const messageParser = str => {
-  console.log(str);
+  console.log('device response');
   const message = str.trim();
   const dataBody = message.slice(1, str.length - 1);
   const [t, cmd, data] = dataBody.split(' ');
