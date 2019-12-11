@@ -42,7 +42,8 @@
 import ProductListComponent from '@/components/ProductList.vue';
 import ProductSelectComponent from '@/components/ProductSelect.vue';
 
-import API from '@/mixin/api';
+// import API from '@/mixin/api';
+import API from '@/mixin/device';
 
 import { chain, findIndex } from 'lodash';
 
@@ -70,9 +71,10 @@ export default {
   },
   methods: {
     async bindProduct() {
-      const list = await this.getProductList();
-      const { data } = await this.$axios.put('/products', list);
-      this.list = data;
+      // const list = await this.getProductList();
+      // const { data } = await this.$axios.put('/products', list);
+      // this.list = data;
+      this.list = await this.stockList();
     },
 
     selectProduct(product) {

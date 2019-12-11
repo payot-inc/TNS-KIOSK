@@ -5,7 +5,6 @@
     :centered="true"
     :hide-header="true"
     :hide-footer="true"
-    :no-close-on-backdrop="true"
     dialog-class="credit_modal"
     :body-class="['credit_modal']"
   >
@@ -31,10 +30,12 @@
 </template>
 
 <script>
-import { take } from 'rxjs/operators';
+import API from '@/mixin/device';
+import { take, timeout } from 'rxjs/operators';
 
 export default {
   name: 'mobile-modal',
+  mixins: [API],
   data() {
     return {
       open: false,
@@ -48,26 +49,28 @@ export default {
       },
     };
   },
-  watch: {
-    open(newValue) {
-      if (newValue) return;
-      this.observer.unsubscribe();
-    }
-  },
+  // watch: {
+  //   open(newValue) {
+  //     if (newValue) return;
+  //     this.observer.unsubscribe();
+  //   },
+  // },
   methods: {
-    show(amount, products) {
-      this.total = amount;
-      this.qrcode = JSON.stringify({
-        type: 'kiosk',
-        amount,
-      });
-      this.observer = this.$socket.response.pipe(take(1)).subscribe(
-        value => {
-          this.$emit('submit', { type: 'mobile', less: 0 });
-        },
-        () => {},
-      );
-      this.open = true;
+    async show(amount, products) {
+      try {
+        this.total = amount;
+        this.qrcode = JSON.stringify({
+          type: 'kiosk',
+          amount,
+        });
+        this.open = true;
+        await this.$socket.response.pipe(take(1), timeout(60 * 1000)).toPromise();
+        await this.payment('card', products);
+
+        this.$emit('submit', { type: 'mobile', less: 0 });
+      } catch (error) {
+        this.$emit('error', error);
+      }
     },
   },
 };

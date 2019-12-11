@@ -1,37 +1,80 @@
 import Vue from 'vue';
 import SerialPort from 'serialport';
-import { Readline } from 'serialport/lib/parsers';
-import { Subject } from 'rxjs';
+import { Subject, zip, of } from 'rxjs';
+import { map, filter, take, timeout } from 'rxjs/operators';
 
-const event = new Subject();
-const message = new Subject();
+let client = {};
+const status = new Subject(false);
+const response = new Subject({});
 
-let client = {}
-SerialPort.list((err, list) => {
-  if (err) return;
+// 메시지 보내기
+const sendObserver = message => {
+  const commend = `[${message}]`;
+  return of(client.write(commend + '\r\n'));
+};
+
+// 메시지 수신시 파싱
+const messageParser = str => {
+  console.log(str);
+  const message = str.trim();
+  const dataBody = message.slice(1, str.length - 1);
+  const [t, cmd, data] = dataBody.split(' ');
+  const type = { r: 'response', q: 'request' }[t];
+  const commend = { A: 'stock', B: 'cash', C: 'card', D: 'coin', E: 'error', F: 'resume' }[cmd];
+
+  return { type, commend, data };
+};
+
+// 메시지 요청하기 (괄호 없는 전송할 메시지), 핸들링할 이벤트 처리, 대기시간
+export const request = (message, handle, timeover = 2000) => {
+  const reqMessage = messageParser(`[${message}]`);
+
+  return zip(
+    sendObserver(message),
+    response.pipe(
+      filter(res => res.type === 'response'),
+      filter(res => res.commend === reqMessage.commend),
+      filter(res => (handle ? handle(res) : true)),
+    ),
+  )
+    .pipe(
+      map(([, response]) => response.data),
+      take(1),
+      timeout(timeover),
+    )
+    .toPromise();
+};
+
+// 장비 연결
+const connect = async () => {
+  const list = await SerialPort.list();
   const target = list.find(({ productId }) => productId === '6001');
-  client = new SerialPort(target.comName, {
-    baudRate: 38400,
+  const path = target ? target.comName : '/dev/tty.SLAB_USBtoUART';
+  const port = new SerialPort(path, {
+    baudRate: 115200,
     autoOpen: true,
   });
-
-  Vue.prototype.$serial = client;
-  Vue.prototype.$serial.status = event;
-  Vue.prototype.$serial.response = message;
-
-  // 연결시
-  client.on('open', () => {
+  const parser = port.pipe(new SerialPort.parsers.Readline({ delimiter: '\r\n' }));
+  parser.on('data', data => {
+    const msg = messageParser(data);
+    response.next(msg);
+  });
+  port.on('open', () => {
     console.log('open serial');
-    event.next('open');
-    const parser = client.pipe(new Readline({ delimiters: '\r\n' }));
-    parser.on('data', data => {
-      console.log(`response: ${data.trim()}`);
-      message.next(data.trim());
-    });
+    status.next(true);
   });
+  port.on('close', () => status.next(false));
 
-  // 종료시
-  client.on('close', () => {
-    event.next('close');
-  });
-});
+  return { port, parser };
+};
+
+connect()
+  .then(({ port, parser }) => {
+    client = port;
+    Vue.prototype.$serial = port;
+    Vue.prototype.$serial.parser = parser;
+    Vue.prototype.$serial.status = status;
+    Vue.prototype.$serial.request = request;
+    Vue.prototype.$serial.response = response;
+  })
+  .catch(console.log);

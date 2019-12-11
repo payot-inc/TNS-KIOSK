@@ -10,6 +10,7 @@ import axios from 'axios';
 
 let config = {
   baseURL: 'http://15.164.230.61:3000/kiosk',
+  // baseURL: 'http://localhost:3000/kiosk',
   // baseURL: process.env.baseURL || process.env.apiUrl || ""
   // timeout: 60 * 1000, // Timeout
   // withCredentials: true, // Check cross-site Access-Control

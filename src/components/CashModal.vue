@@ -36,12 +36,11 @@
 </template>
 
 <script>
-import { interval } from 'rxjs';
-import { filter, map, tap, startWith, sum, reduce } from 'rxjs/operators';
-import numeral from 'numeral';
+import API from '@/mixin/device';
 
 export default {
   name: 'cash-modal',
+  mixins: [API],
   data() {
     return {
       open: false,
@@ -55,81 +54,30 @@ export default {
     };
   },
   mounted() {
-    this.sub.input = this.$serial.response
-      .pipe(
-        filter(msg => /^\[r B U[\d]{6}\]$/.test(msg)),
-        map(result => {
-          const data = result
-            .replace(/^\[/, '')
-            .replace(/\]$/, '')
-            .split(' ')[2];
-          const [, ...amount] = data;
-          return Number(amount.join(''));
-        }),
-      )
-      .subscribe(input => {
-        this.amount += input;
-      });
-
-    this.sub.error = this.$serial.response
-      .pipe(
-        filter(msg => /^\[r B Y[b-i]\]$/.test(msg)),
-        map(msg => msg.substring(6, 7)),
-        map(err => {
-          switch (err) {
-            case 'b':
-              return { message: '잔돈이 부족합니다', code: err };
-            case 'c':
-              return { message: '반환되었습니다', code: err };
-            case 'd':
-              return { message: '투입시간이 초과되었습니다', code: err };
-            default:
-              return { message: '오류가 발생하였습니다', code: err, print: true };
-          }
-        }),
-      )
-      .subscribe(
-        err => {
-          this.$emit('error', err);
-          this.open = false;
-        },
-        () => {},
-      );
-
-    this.sub.submit = this.$serial.response
-      .pipe(
-        filter(msg => /^\[r B Ya&V[\d]{6}\]$/.test(msg)),
-        map(result => {
-          const data = result
-            .replace(/^\[/, '')
-            .replace(/\]$/, '')
-            .split(' ')[2];
-          const [, ...amount] = data.split('&')[1];
-          return Number(amount.join(''));
-        }),
-      )
-      .subscribe(less => {
-        this.$emit('submit', { type: 'cash', less });
-      });
+    const self = this;
+    this.sub.input = this.inputCashObserver().subscribe(
+      input => {
+        self.amount += input;
+      },
+      () => {},
+    );
   },
   methods: {
-    show(amount, products) {
-      const commendProductParams = products
-        .map(({ machineId, id, price }) => {
-          const productId = id.substring(3, id.length);
-          return `Q${machineId}/R${productId}/S${numeral(Number(price) / 100).format('000')}`;
-        })
-        .join('&');
-      const commend = `[q B T${numeral(amount).format('000000')}&${commendProductParams}]\r\n`;
-      console.log(commend);
-      this.$serial.write(commend);
-      this.total = amount;
-      this.open = true;
+    async show(amount, products) {
+      try {
+        this.total = amount;
+        this.open = true;
+        const resultData = await this.payment('cash', products);
+        const [, lessData] = resultData.split('&');
+        const less = Number(lessData.slice(1, lessData.length));
+        this.$emit('submit', { type: 'cash', less });
+      } catch (error) {
+        this.$emit('error', error);
+      }
     },
   },
   beforeDestroy() {
     this.sub.input.unsubscribe();
-    this.sub.submit.unsubscribe();
   },
 };
 </script>
