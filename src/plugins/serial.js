@@ -15,7 +15,7 @@ const sendObserver = message => {
 
 // 메시지 수신시 파싱
 const messageParser = str => {
-  console.log('device response');
+  console.log(str);
   const message = str.trim();
   const dataBody = message.slice(1, str.length - 1);
   const [t, cmd, data] = dataBody.split(' ');
@@ -26,7 +26,7 @@ const messageParser = str => {
 };
 
 // 메시지 요청하기 (괄호 없는 전송할 메시지), 핸들링할 이벤트 처리, 대기시간
-export const request = (message, handle, timeover = 2000) => {
+export const request = (message, handle, timeover = 5000) => {
   const reqMessage = messageParser(`[${message}]`);
 
   return zip(
@@ -40,7 +40,7 @@ export const request = (message, handle, timeover = 2000) => {
     .pipe(
       map(([, response]) => response.data),
       take(1),
-      // timeout(timeover),
+      timeout(timeover),
     )
     .toPromise();
 };
