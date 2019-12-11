@@ -55,9 +55,9 @@ export default {
       const coinRequest = 'q D X';
 
       // 장비로부터 재고현황 조회
-      const stockResponse = await this.$serial.request(stockRequest, null, 1000 * 4);
+      const stockResponse = await this.$serial.request(stockRequest);
       // 장비로부터 잔돈현황 조회
-      const coinResponse = await this.$serial.request(coinRequest, null, 1000 * 4);
+      const coinResponse = await this.$serial.request(coinRequest);
 
       // 재고목록 맵핑
       const stock = stockResponse.split('&').map(item => {

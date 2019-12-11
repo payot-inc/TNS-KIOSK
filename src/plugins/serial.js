@@ -40,7 +40,7 @@ export const request = (message, handle, timeover = 2000) => {
     .pipe(
       map(([, response]) => response.data),
       take(1),
-      timeout(timeover),
+      // timeout(timeover),
     )
     .toPromise();
 };
