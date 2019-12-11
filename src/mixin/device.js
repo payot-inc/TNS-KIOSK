@@ -57,7 +57,7 @@ export default {
       // 장비로부터 재고현황 조회
       const stockResponse = await this.$serial.request(stockRequest);
       // 장비로부터 잔돈현황 조회
-      const coinResponse = await this.$serial.request(coinRequest);
+      // const coinResponse = await this.$serial.request(coinRequest);
 
       // 재고목록 맵핑
       const stock = stockResponse.split('&').map(item => {
@@ -70,21 +70,21 @@ export default {
       });
       console.log(stock);
       // 잔돈 맵핑
-      const coins = coinResponse
-        .split('&')
-        .map(([key, ...value]) => {
-          const keySet = { K: 'coin10', L: 'coin50', M: 'coin100', N: 'coin500', O: 'coin1000' }[
-            key
-          ];
-          let result = {};
-          result[keySet] = Number(value.join('').toString());
-          return result;
-        })
-        .reduce((acc, value) => ({ ...acc, ...value }), {});
+      // const coins = coinResponse
+      //   .split('&')
+      //   .map(([key, ...value]) => {
+      //     const keySet = { K: 'coin10', L: 'coin50', M: 'coin100', N: 'coin500', O: 'coin1000' }[
+      //       key
+      //     ];
+      //     let result = {};
+      //     result[keySet] = Number(value.join('').toString());
+      //     return result;
+      //   })
+      //   .reduce((acc, value) => ({ ...acc, ...value }), {});
       // 상품내역 업데이트 및 조회
       const { data: serverStockList } = await this.$axios.put('/products', stock);
       // 잔액내역 업데이트
-      await this.$axios.put('/coins', coins);
+      // await this.$axios.put('/coins', coins);
 
       return serverStockList;
     },
