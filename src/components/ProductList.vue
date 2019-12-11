@@ -18,8 +18,9 @@
         <a class="col-md-4" v-for="p in batchProducts" :key="p.id" @click="$emit('select', p)">
           <dl>
             <dt>
-              <img src="@/assets/img/p01.png" />
-              <span class="number">{{ p.count }}</span>
+              <!-- <img src="@/assets/img/p01.png" /> -->
+              <label>{{ p.name }}</label>
+              <span class="number">{{ p.count }}개</span>
             </dt>
             <dd>{{ p.price | numeral('0,0') }}원</dd>
           </dl>

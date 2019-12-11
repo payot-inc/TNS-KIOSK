@@ -28,6 +28,7 @@
     <b-modal
       ref="progress"
       size="lg"
+      v-model="modal.progress"
       :no-close-on-backdrop="true"
       :centered="true"
       :hide-header="true"
@@ -42,7 +43,6 @@
 import ProductListComponent from '@/components/ProductList.vue';
 import ProductSelectComponent from '@/components/ProductSelect.vue';
 
-// import API from '@/mixin/api';
 import API from '@/mixin/device';
 
 import { chain, findIndex } from 'lodash';
@@ -64,19 +64,10 @@ export default {
   },
   async mounted() {
     this.modal.progress = true;
-    setTimeout(async () => {
-      await this.bindProduct();
-      this.modal.progress = false;
-    }, 2000);
+    this.list = await this.stockList();
+    this.modal.progress = false;
   },
   methods: {
-    async bindProduct() {
-      // const list = await this.getProductList();
-      // const { data } = await this.$axios.put('/products', list);
-      // this.list = data;
-      this.list = await this.stockList();
-    },
-
     selectProduct(product) {
       try {
         const { machineId } = product;

@@ -1,9 +1,18 @@
-import { filter, map, tap } from 'rxjs/operators';
-import { chain } from 'lodash';
+import { filter, map } from 'rxjs/operators';
+import { mapState, mapMutations } from 'vuex';
+import { chain, isEmpty, difference } from 'lodash';
 import numeral from 'numeral';
 
 export default {
+  computed: {
+    ...mapState(['buckets', 'bucketList']),
+  },
   methods: {
+    ...mapMutations({
+      setBuckets: 'SET_BUCKET',
+      setBucektList: 'SET_BUCEKT_LIST',
+    }),
+
     // 금액 들어오는 이벤트
     inputCashObserver() {
       const filterCommend = ({ type, commend, data }) => {
@@ -21,16 +30,18 @@ export default {
     // 결제하기
     async payment(method = 'cash', products) {
       const totalAmount = chain(products)
-        .sumBy('price')
+        .map(({ price }) => Number(price))
+        .sum()
         .value();
       const commendString = method === 'cash' ? 'B' : 'C';
       const dataTypeString = method === 'cash' ? 'T' : 'U';
       const amount = numeral(totalAmount).format('000000');
       const productList = products
-        .map(({ machine, product, price }) => {
+        .map(({ machineId, id, price }) => {
+          const productCode = id.slice(3, id.length);
           return [
-            'Q' + numeral(machine).format('000'),
-            'R' + numeral(product).format('000'),
+            'Q' + numeral(machineId).format('000'),
+            'R' + numeral(productCode).format('000'),
             'S' + numeral(price / 100).format('000'),
           ].join('/');
         })
@@ -49,48 +60,101 @@ export default {
       return await this.$serial.request(requestString, requestFilter, 60 * 1000);
     },
 
-    // 재고보유 현황 (서버로 부터의 재고목록 및 잔액 싱크)
-    async stockList() {
+    // 재고목록 조회하기
+    async getBuckets() {
       const stockRequest = 'q A X';
-      const coinRequest = 'q D X';
-
-      // 장비로부터 재고현황 조회
       const stockResponse = await this.$serial.request(stockRequest);
-      // 장비로부터 잔돈현황 조회
-      // const coinResponse = await this.$serial.request(coinRequest);
-
       // 재고목록 맵핑
-      const stock = stockResponse.split('&').map(item => {
-        const [m, p, s] = item.split('/');
-        return {
-          machine: m.slice(1, m.length),
-          product: p.slice(1, m.length),
-          count: s.slice(1, m.length),
-        };
-      });
-      console.log(stock);
-      // 잔돈 맵핑
-      // const coins = coinResponse
-      //   .split('&')
-      //   .map(([key, ...value]) => {
-      //     const keySet = { K: 'coin10', L: 'coin50', M: 'coin100', N: 'coin500', O: 'coin1000' }[
-      //       key
-      //     ];
-      //     let result = {};
-      //     result[keySet] = Number(value.join('').toString());
-      //     return result;
-      //   })
-      //   .reduce((acc, value) => ({ ...acc, ...value }), {});
-      // 상품내역 업데이트 및 조회
-      const { data: serverStockList } = await this.$axios.put('/products', stock);
-      // 잔액내역 업데이트
-      // await this.$axios.put('/coins', coins);
+      const stock = chain(stockResponse.split('&'))
+        .map(item => {
+          const [m, p, s] = item.split('/');
+          return {
+            machine: m.slice(1, m.length),
+            product: p.slice(1, m.length),
+            count: s.slice(1, m.length),
+          };
+        })
+        .sortBy(['machine', 'product'])
+        .value();
+      
+      const hasStockListString = JSON.stringify(this.buckets);
+      
+      if (hasStockListString !== JSON.stringify(stock)) {
+        this.setBuckets(stock);
+        const diffrentRows = difference(stock, JSON.parse(hasStockListString));
+        console.log('재고목록 변동사항', diffrentRows);
+        const { data } = await this.$axios.put('/products', diffrentRows);
+        this.setBucektList(data);
+      }
 
-      return serverStockList;
+      return this.bucketList;
     },
+
+    // 잔돈 목록 가져오기
+    async getCoins() {
+      const coinRequest = 'q D X';
+      const coinResponse = await this.$serial.request(coinRequest);
+      const coins = coinResponse
+        .split('&')
+        .map(([key, ...value]) => {
+          const keySet = { K: 'coin10', L: 'coin50', M: 'coin100', N: 'coin500', O: 'coin1000' }[
+            key
+          ];
+          let result = {};
+          result[keySet] = Number(value.join('').toString());
+          return result;
+        })
+        .reduce((acc, value) => ({ ...acc, ...value }), {});
+      await this.$axios.put('/coins', coins);
+    },
+
+    async stockList() {
+      await this.getCoins();
+      return await this.getBuckets();
+    },
+
+    // 재고보유 현황 (서버로 부터의 재고목록 및 잔액 싱크)
+    // async stockList() {
+    //   const stockRequest = 'q A X';
+    //   const coinRequest = 'q D X';
+
+    //   // 장비로부터 재고현황 조회
+    //   const stockResponse = await this.$serial.request(stockRequest);
+    //   // 장비로부터 잔돈현황 조회
+    //   const coinResponse = await this.$serial.request(coinRequest);
+
+    //   // 재고목록 맵핑
+    //   const stock = stockResponse.split('&').map(item => {
+    //     const [m, p, s] = item.split('/');
+    //     return {
+    //       machine: m.slice(1, m.length),
+    //       product: p.slice(1, m.length),
+    //       count: s.slice(1, m.length),
+    //     };
+    //   });
+    //   console.log(stock);
+    //   // 잔돈 맵핑
+    //   const coins = coinResponse
+    //     .split('&')
+    //     .map(([key, ...value]) => {
+    //       const keySet = { K: 'coin10', L: 'coin50', M: 'coin100', N: 'coin500', O: 'coin1000' }[
+    //         key
+    //       ];
+    //       let result = {};
+    //       result[keySet] = Number(value.join('').toString());
+    //       return result;
+    //     })
+    //     .reduce((acc, value) => ({ ...acc, ...value }), {});
+    //   // 상품내역 업데이트 및 조회
+    //   const { data: serverStockList } = await this.$axios.put('/products', stock);
+    //   // 잔액내역 업데이트
+    //   await this.$axios.put('/coins', coins);
+
+    //   return serverStockList;
+    // },
 
     fakeDeviceError() {
       this.$serial.parser.send(`[q E Q 001&015&900&910]\r\n`);
-    }
+    },
   },
 };
