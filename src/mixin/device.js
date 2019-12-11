@@ -68,6 +68,7 @@ export default {
           count: s.slice(1, m.length),
         };
       });
+      console.log(stock);
       // 잔돈 맵핑
       const coins = coinResponse
         .split('&')
