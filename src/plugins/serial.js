@@ -26,7 +26,7 @@ const messageParser = str => {
 };
 
 // 메시지 요청하기 (괄호 없는 전송할 메시지), 핸들링할 이벤트 처리, 대기시간
-export const request = (message, handle, timeover = 5000) => {
+export const request = (message, handle, timeover = 1000 * 10) => {
   const reqMessage = messageParser(`[${message}]`);
 
   return zip(
