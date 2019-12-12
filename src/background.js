@@ -16,13 +16,13 @@ protocol.registerSchemesAsPrivileged([
 function createWindow() {
   // Create the browser window.
   win = new BrowserWindow({
-    width: 1080,
-    height: 1920,
+    // width: 1080,
+    // height: 1920,
     kiosk: true,
-    // fullscreen: true,
-    // webPreferences: {
-    //   nodeIntegration: true,
-    // },
+    fullscreen: true,
+    webPreferences: {
+      nodeIntegration: true,
+    },
   });
 
   win.setMenu(null);
