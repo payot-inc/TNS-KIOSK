@@ -65,6 +65,7 @@ export default {
   async mounted() {
     this.modal.progress = true;
     this.list = await this.stockList();
+    console.log(this.list);
     this.modal.progress = false;
   },
   methods: {

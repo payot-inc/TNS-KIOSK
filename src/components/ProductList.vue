@@ -3,12 +3,12 @@
     <div class="machine">
       <ul>
         <li
-          v-for="(m, index) in machines"
+          v-for="(m) in machines"
           :key="m"
           :class="{ on: selectMachineId === m }"
           @click="selectMachineId = m"
         >
-          <strong>{{ (index + 1) | numeral('00') }}</strong>
+          <strong>{{ m.machineId | numeral('00') }}</strong>
           <span>자판기</span>
         </li>
       </ul>
