@@ -50,7 +50,6 @@ export const request = (message, handle, timeover = 1000 * 10) => {
 // 장비 연결
 const connect = async () => {
   const list = await SerialPort.list();
-  console.log(list);
   const target = list.find(({ productId }) => productId === '6001');
   const path = target ? target.comName : '/dev/tty.SLAB_USBtoUART';
   const port = new SerialPort(path, {
