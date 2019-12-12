@@ -87,8 +87,9 @@ export default {
         this.setBucektList(data);
       }
 
-      const { data } = await this.$axios.get('/products');
-      return data;
+      const { data: response } = await this.$axios.get('/products');
+      console.log(response);
+      return response;
     },
 
     // 잔돈 목록 가져오기

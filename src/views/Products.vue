@@ -64,9 +64,13 @@ export default {
   },
   async mounted() {
     this.modal.progress = true;
-    this.list = await this.stockList();
-    console.log(this.list);
-    this.modal.progress = false;
+    try {
+      this.list = await this.stockList();
+    } catch (error) {
+      console.log(error);  
+    } finally {
+      this.modal.progress = false;
+    }
   },
   methods: {
     selectProduct(product) {

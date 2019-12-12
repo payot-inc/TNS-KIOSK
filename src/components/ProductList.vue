@@ -8,7 +8,7 @@
           :class="{ on: selectMachineId === m }"
           @click="selectMachineId = m"
         >
-          <strong>{{ m.machineId | numeral('00') }}</strong>
+          <strong>{{ m | numeral('00') }}</strong>
           <span>자판기</span>
         </li>
       </ul>
