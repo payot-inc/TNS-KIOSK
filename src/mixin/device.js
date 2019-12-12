@@ -83,7 +83,7 @@ export default {
         this.setBuckets(stock);
         const diffrentRows = difference(stock, JSON.parse(hasStockListString));
         console.log('재고목록 변동사항', diffrentRows);
-        const { data } = await this.$axios.put('/products', diffrentRows);
+        const { data } = await this.$axios.put('/products', diffrentRows).catch(console.log);
         this.setBucektList(data);
       }
 
