@@ -114,8 +114,10 @@ export default {
       return await this.getBuckets();
     },
 
+    // 오류 메시지 테스트
     fakeDeviceError() {
-      this.$serial.parser.send(`[q E Q 001&015&900&910]\r\n`);
+      // console.log(this.$serial.parser);
+      this.$serial.parser.write(`[q E Q001&Q015&Q900&Q910]\r\n`);
     },
   },
 };

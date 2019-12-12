@@ -1,5 +1,7 @@
 import Vue from 'vue';
 import SerialPort from 'serialport';
+import { http } from './axios';
+import axios from 'axios';
 import { Subject, zip, of } from 'rxjs';
 import { map, filter, take, timeout } from 'rxjs/operators';
 
@@ -48,6 +50,7 @@ export const request = (message, handle, timeover = 1000 * 10) => {
 // 장비 연결
 const connect = async () => {
   const list = await SerialPort.list();
+  console.log(list);
   const target = list.find(({ productId }) => productId === '6001');
   const path = target ? target.comName : '/dev/tty.SLAB_USBtoUART';
   const port = new SerialPort(path, {
@@ -68,6 +71,7 @@ const connect = async () => {
   return { port, parser };
 };
 
+// 장비와 연결하기
 connect()
   .then(({ port, parser }) => {
     client = port;
@@ -78,3 +82,32 @@ connect()
     Vue.prototype.$serial.response = response;
   })
   .catch(console.log);
+
+// 오류 상황
+response.pipe(
+  filter(({ commend }) => commend === 'error'),
+  map(({ data }) => {
+    return data
+      .split('&')
+      .map(str => str.slice(1, str.length))
+      .map(id => ({ id, isBroken: true }));
+  }),
+).subscribe(params => {
+  console.log('장비 고장 목록', params);
+  // console.log(http);
+  http.post('/machine/error', params);
+}, console.log);
+
+// 오류 수정사항
+response.pipe(
+  filter(({ commend }) => commend === 'resume'),
+  map(({ data }) => {
+    return data
+      .split('&')
+      .map(str => str.slice(1, str.length))
+      .map(id => ({ id, isBroken: false }));
+  }),
+).subscribe(params => {
+  console.log('장비 정상화 목록', params);
+  http.post('/machine/error', params);
+}, console.log);

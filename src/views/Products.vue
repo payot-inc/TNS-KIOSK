@@ -63,6 +63,7 @@ export default {
     };
   },
   async mounted() {
+    this.fakeDeviceError();
     this.modal.progress = true;
     this.list = await this.stockList();
     this.modal.progress = false;
