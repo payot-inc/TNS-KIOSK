@@ -57,12 +57,6 @@ export default {
         .value();
     },
   },
-  methods: {
-    imageURL(index) {
-      const images = require.context('../assets/img/products', false, /\.jpg$/);
-      return images('./', numeral(index + 1).format('00') + '.jpg');
-    },
-  },
   watch: {
     machines(newValue) {
       this.selectMachineId = newValue[0];
