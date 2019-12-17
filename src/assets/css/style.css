@@ -374,18 +374,23 @@ a:hover{text-decoration: none;color:#292929;}
 }
 
 .product .list .items dt{
-  /* height:200px; */
-  padding: 20px;
+  height:210px;
+  display:flex;
+  align-items: center;
+  justify-content: center;
   overflow:hidden;
   position: relative;
   text-align:left;
 }
 .product .list .items dt img{
-  width:90%;
+  width:100%;
+
 }
 
 .product .list .items dt span{
-  margin-top:20px;
+  position:absolute;
+  top:15px;
+  right:15px;
   display:block;
   text-align:left;
   font-size:30px;

@@ -3,7 +3,7 @@
     <div class="machine">
       <ul>
         <li
-          v-for="(m) in machines"
+          v-for="m in machines"
           :key="m"
           :class="{ on: selectMachineId === m }"
           @click="selectMachineId = m"
@@ -18,8 +18,7 @@
         <a class="col-md-4" v-for="p in batchProducts" :key="p.id" @click="$emit('select', p)">
           <dl>
             <dt>
-              <!-- <img src="@/assets/img/p01.png" /> -->
-              <label>{{ p.name }}</label>
+              <img :src="p.img" :alt="p.img" />
               <span class="number">{{ p.count }}개</span>
             </dt>
             <dd>{{ p.price | numeral('0,0') }}원</dd>
@@ -32,6 +31,7 @@
 
 <script>
 import { chain, get } from 'lodash';
+import numeral from 'numeral';
 
 export default {
   props: ['products'],
@@ -50,8 +50,17 @@ export default {
     machineProducts() {
       return chain(this.products)
         .filter(['machineId', this.selectMachineId])
+        .map((item, index) => {
+          return { ...item, img: `products/${(index % 41) + 1}.jpg` };
+        })
         .chunk(3)
         .value();
+    },
+  },
+  methods: {
+    imageURL(index) {
+      const images = require.context('../assets/img/products', false, /\.jpg$/);
+      return images('./', numeral(index + 1).format('00') + '.jpg');
     },
   },
   watch: {
