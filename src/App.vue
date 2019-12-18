@@ -17,7 +17,10 @@ import { of, map, filter, delay, startWith } from 'rxjs/operators';
 export default {
   mixins: [API],
   mounted() {
-    this.stockList();
+    const self = this;
+    setTimeout(() => {
+      self.stockList();
+    }, 2000);
     // const self = this;
     // 오류 핸들러
     // of(null).pipe(
