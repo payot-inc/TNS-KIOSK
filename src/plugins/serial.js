@@ -53,7 +53,7 @@ const connect = async () => {
   const target = list.find(({ productId }) => productId === '6001');
   const path = target ? target.comName : '/dev/tty.SLAB_USBtoUART';
   const port = new SerialPort(path, {
-    baudRate: 1843200,
+    baudRate: 921600,
     autoOpen: true,
   });
   const parser = port.pipe(new SerialPort.parsers.Readline({ delimiter: '\r\n' }));
