@@ -77,7 +77,7 @@ export default {
     };
   },
   mounted() {
-    this.getProductList();
+    this.stockList();
   },
   subscriptions() {
     let counter = this.timeOut;
