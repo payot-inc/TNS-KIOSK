@@ -32,16 +32,18 @@
             <dt>결제금액</dt>
             <dd>
               <b>
-                {{ this.products.reduce((acc, { price }) => acc + Number(price), 0) | numeral('0,0') }}
-              </b>원
+                {{
+                  this.products.reduce((acc, { price }) => acc + Number(price), 0) | numeral('0,0')
+                }} </b
+              >원
             </dd>
           </dl>
           <dl>
             <dt>잔액</dt>
             <dd>
               <b>
-                {{ this.less | numeral('0,0') }}
-              </b>원
+                {{ this.less | numeral('0,0') }} </b
+              >원
             </dd>
           </dl>
         </div>
@@ -77,9 +79,7 @@ export default {
     };
   },
   mounted() {
-    setTimeout(() => {
-      this.stockList();
-    }, 2000);
+    this.stockList();
   },
   subscriptions() {
     let counter = this.timeOut;
