@@ -25,7 +25,7 @@ function createWindow() {
     },
   });
 
-  // win.setMenu(null);
+  win.setMenu(null);
   win.webContents.setZoomFactor(1);
   win.webContents.setVisualZoomLevelLimits(1);
   win.webContents.setLayoutZoomLevelLimits(1);
