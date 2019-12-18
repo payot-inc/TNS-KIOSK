@@ -11,10 +11,13 @@
 
 <script>
 import { interval } from 'rxjs';
+import API from './mixin/device';
 import { of, map, filter, delay, startWith } from 'rxjs/operators';
 
 export default {
-  async mounted() {
+  mixins: [API],
+  mounted() {
+    this.stockList();
     // const self = this;
     // 오류 핸들러
     // of(null).pipe(
