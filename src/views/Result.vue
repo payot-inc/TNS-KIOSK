@@ -79,7 +79,7 @@ export default {
   mounted() {
     setTimeout(() => {
       this.stockList();
-    }, 1000);
+    }, 2000);
   },
   subscriptions() {
     let counter = this.timeOut;
