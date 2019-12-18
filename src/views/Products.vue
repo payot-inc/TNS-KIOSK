@@ -65,9 +65,10 @@ export default {
   async mounted() {
     this.modal.progress = true;
     try {
-      this.list = await this.stockList();
+      const { data } = await this.$axios.get('/products');
+      this.list = data;
     } catch (error) {
-      console.log(error);  
+      console.log(error);
     } finally {
       this.modal.progress = false;
     }

@@ -18,7 +18,7 @@ const event = new Subject();
 const message = new Subject();
 
 const client = new SerialPort(path, {
-  baudRate: 115200,
+  baudRate: 1843200,
   autoOpen: true,
 });
 
