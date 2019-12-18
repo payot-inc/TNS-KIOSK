@@ -66,7 +66,7 @@
 <script>
 import { zip, interval, range } from 'rxjs';
 import { skip, tap, take, delay, map, startWith, takeLast } from 'rxjs/operators';
-import API from '@/mixin/api';
+import API from '@/mixin/device';
 
 export default {
   props: ['products', 'type', 'less'],
