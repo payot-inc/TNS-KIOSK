@@ -110,3 +110,11 @@ response.pipe(
   console.log('장비 정상화 목록', params);
   http.post('/machine/error', params);
 }, console.log);
+
+// 장비 현금 투입
+response.pipe(
+  filter(({ type, commend }) => type === 'response' && commend === 'coin'),
+  map(({ data }) => Number(data.slice(1, data.length))),
+).subscribe(price => {
+  http.post('/insertCoin', { amount: price });
+}, console.log);
