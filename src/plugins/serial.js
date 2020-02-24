@@ -125,5 +125,5 @@ response
     map(({ data }) => Number(data.slice(1, data.length))),
   )
   .subscribe(price => {
-    http.post('/insertCoin', { amount: price });
+    http.post('/insert/coin', { amount: price });
   }, console.log);
