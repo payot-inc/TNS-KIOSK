@@ -9,7 +9,7 @@ import axios from 'axios';
 // axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 
 let config = {
-  baseURL: 'http://15.164.230.61:3000/kiosk',
+  baseURL: 'http://13.124.113.150:3000/kiosk',
   // baseURL: 'http://localhost:3000/kiosk',
   // baseURL: process.env.baseURL || process.env.apiUrl || ""
   // timeout: 60 * 1000, // Timeout

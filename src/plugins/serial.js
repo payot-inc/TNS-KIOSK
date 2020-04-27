@@ -1,7 +1,6 @@
 import Vue from 'vue';
 import SerialPort from 'serialport';
 import { http } from './axios';
-import axios from 'axios';
 import { Subject, zip, of } from 'rxjs';
 import { map, filter, take, timeout } from 'rxjs/operators';
 
