@@ -3,7 +3,7 @@ import { Subject } from 'rxjs';
 
 const response = new Subject();
 
-const socket = new WebSocket('ws://15.164.230.61:3000');
+const socket = new WebSocket('ws://13.209.19.129:3000');
 socket.onopen = () => {
   console.log('open socket');
 }

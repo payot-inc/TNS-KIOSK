@@ -82,38 +82,47 @@ connect()
   .catch(console.log);
 
 // 오류 상황
-response.pipe(
-  filter(({ commend }) => commend === 'error'),
-  map(({ data }) => {
-    return data
-      .split('&')
-      .map(str => str.slice(1, str.length))
-      .map(id => ({ id, isBroken: true }));
-  }),
-).subscribe(params => {
-  console.log('장비 고장 목록', params);
-  // console.log(http);
-  http.post('/machine/error', params);
-}, console.log);
+response
+  .pipe(
+    filter(({ commend }) => commend === 'error'),
+    map(({ data }) => {
+      return data
+        .split('&')
+        .map(str => str.slice(1, str.length))
+        .map(id => ({ id, isBroken: true }));
+    }),
+  )
+  .subscribe(params => {
+    console.log('장비 고장 목록', params);
+    // console.log(http);
+    http.post('/machine/error', params);
+  }, console.log);
 
 // 오류 수정사항
-response.pipe(
-  filter(({ commend }) => commend === 'resume'),
-  map(({ data }) => {
-    return data
-      .split('&')
-      .map(str => str.slice(1, str.length))
-      .map(id => ({ id, isBroken: false }));
-  }),
-).subscribe(params => {
-  console.log('장비 정상화 목록', params);
-  http.post('/machine/error', params);
-}, console.log);
+response
+  .pipe(
+    filter(({ commend }) => commend === 'resume'),
+    map(({ data }) => {
+      return data
+        .split('&')
+        .map(str => str.slice(1, str.length))
+        .map(id => ({ id, isBroken: false }));
+    }),
+  )
+  .subscribe(params => {
+    console.log('장비 정상화 목록', params);
+    http.post('/machine/error', params);
+  }, console.log);
 
-// 장비 현금 투입
-response.pipe(
-  filter(({ type, commend }) => type === 'response' && commend === 'coin'),
-  map(({ data }) => Number(data.slice(1, data.length))),
-).subscribe(price => {
-  http.post('/insertCoin', { amount: price });
-}, console.log);
+response
+  .pipe(
+    filter(({ type, commend, data }) => {
+      if (type !== 'response') return false;
+      if (commend !== 'cash') return false;
+      return /^U[\d]{6}$/.test(data);
+    }),
+    map(({ data }) => Number(data.slice(1, data.length))),
+  )
+  .subscribe(price => {
+    http.post('/insert/coin', { amount: price });
+  }, console.log);
