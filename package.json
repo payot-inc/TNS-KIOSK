@@ -16,7 +16,7 @@
     "@chenfengyuan/vue-qrcode": "^1.0.1",
     "bootstrap-vue": "^2.0.0-rc.19",
     "core-js": "^3.3.2",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "moment": "^2.24.0",
     "numeral": "^2.0.6",
     "rxjs": "^6.3.3",
